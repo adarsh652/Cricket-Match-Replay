@@ -17,21 +17,15 @@ from matplotlib.patches import Circle, Rectangle
 class CricketReplayApp(QWidget):
     def __init__(self):
         super().__init__()
-
-        # Load data
         self.df = pd.read_csv(r"C:\Users\iadar\OneDrive\Desktop\cricket_match_replay\data\mockData.csv")
         self.total_balls = len(self.df)
 
-        # Match state
         self.current_ball = 0
         self.total_runs = 0
         self.wickets = 0
-
-        # Window
         self.setWindowTitle("🏏 Cricket Match Replay")
         self.setGeometry(200, 200, 650, 700)
 
-        # ---------------- STYLES ----------------
         self.setStyleSheet("""
             QWidget {
                 background-color: #0f172a;
@@ -52,15 +46,11 @@ class CricketReplayApp(QWidget):
             }
         """)
 
-        # ---------------- LAYOUT ----------------
         self.main_layout = QVBoxLayout()
-
-        # Title
         title = QLabel("🏏 Cricket Match Replay")
         title.setStyleSheet("font-size: 20px; font-weight: bold;")
         self.main_layout.addWidget(title)
 
-        # Scoreboard
         self.score_label = QLabel("Score: 0 / 0")
         self.score_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.main_layout.addWidget(self.score_label)
@@ -69,32 +59,27 @@ class CricketReplayApp(QWidget):
         self.over_label.setStyleSheet("font-size: 14px; color: #cbd5f5;")
         self.main_layout.addWidget(self.over_label)
 
-        # Commentary
         self.replay_label = QLabel("Press ▶ Play or Next Ball to start replay")
         self.replay_label.setWordWrap(True)
         self.replay_label.setStyleSheet("font-size: 16px;")
         self.main_layout.addWidget(self.replay_label)
 
-        # -------- SLIDER --------
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setMinimum(0)
         self.slider.setMaximum(self.total_balls)
         self.slider.valueChanged.connect(self.seek_ball)
         self.main_layout.addWidget(self.slider)
 
-        # -------- FIELD VIEW --------
         self.field_fig = Figure(figsize=(4, 4))
         self.field_canvas = FigureCanvas(self.field_fig)
         self.field_ax = self.field_fig.add_subplot(111)
         self.main_layout.addWidget(self.field_canvas)
         self.draw_field()
 
-        # Status
         self.status_label = QLabel("Ball: 0 / 0")
         self.status_label.setStyleSheet("font-size: 13px; color: #cbd5f5;")
         self.main_layout.addWidget(self.status_label)
 
-        # -------- BUTTONS --------
         btn_layout = QHBoxLayout()
 
         self.play_button = QPushButton("▶ Play")
@@ -117,31 +102,20 @@ class CricketReplayApp(QWidget):
         self.main_layout.addLayout(btn_layout)
         self.setLayout(self.main_layout)
 
-        # Timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.show_next_ball)
 
         self.update_status()
 
-    # ---------------- FIELD ----------------
-
     def draw_field(self):
         self.field_ax.clear()
-
-        # Boundary
         self.field_ax.add_patch(Circle((0, 0), 75, fill=False, linewidth=2, color="white"))
-
-        # 30-yard circle
         self.field_ax.add_patch(
             Circle((0, 0), 30, fill=False, linestyle="--", color="#94a3b8")
         )
-
-        # Pitch
         self.field_ax.add_patch(
             Rectangle((-3, -20), 6, 40, color="#a16207", alpha=0.85)
         )
-
-        # Center
         self.field_ax.scatter(0, 0, color="white", s=30)
 
         self.field_ax.set_xlim(-80, 80)
@@ -174,8 +148,6 @@ class CricketReplayApp(QWidget):
         self.field_ax.scatter(x, y, color=color, s=60, edgecolors="white", zorder=5)
 
         self.field_canvas.draw()
-
-    # ---------------- LOGIC ----------------
 
     def calculate_state_until(self, index):
         self.total_runs = 0
@@ -248,9 +220,6 @@ class CricketReplayApp(QWidget):
 
     def update_status(self):
         self.status_label.setText(f"Ball: {self.current_ball} / {self.total_balls}")
-
-
-# ---------------- RUN ----------------
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
